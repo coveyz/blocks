@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "./bin/index.js",
-  "bin": "./bin/index.js",
+  "bin": {
+    "box": "./bin/index.js"
+  },
   "scripts": {
-    "test": "node bin/index"
+    "test": "node bin/lib/create"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +15,7 @@
   "devDependencies": {
     "chalk": "^2.4.2",
     "clear": "^0.1.0",
+    "commander": "^9.3.0",
     "ejs": "^3.1.8",
     "fs-extra": "^10.1.0",
     "handlebars": "^4.7.7",

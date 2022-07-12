@@ -18,6 +18,7 @@ const handleOptions = (options) => {
 
 //* 获取配置文件
 module.exports = async () => {
-	const answer = await inquirer.prompt([packageName(), middlewares()]);
+	// const answer = await inquirer.prompt([packageName(), middlewares()]);
+	const answer = await inquirer.prompt([middlewares()]);
 	return handleOptions(answer);
 };

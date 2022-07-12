@@ -1,61 +1,30 @@
-const chalk = require('chalk');
-const clear = require('clear');
-const path = require('path');
-
-const getOptions = require('./options');
-const { downloadTemplate } = require('./utils/tools');
-const { FolderTask, TaskManager } = require('./task');
-const createCompnentFile = require('./function/create-component-file');
-
-const log = (content) => console.log(chalk['green'](content));
-let options = null;
-
-(async () => {
-	clear();
-	//* 获取配置文件
-	options = await getOptions();
-
-	log(JSON.stringify(options));
-
-	const { middlewares, maxMiddles } = options;
-
-	const len = middlewares.length;
-	//* 1.0.0 如果 middlewares 为空 拉取模版项目
-	if (len === 0) {
-		await downloadTemplate(options, 'template');
-	}
-	//* 2.0.0如果 middlewares 长度 === 所有配置项的长度   直接拉取完整项目
-	else if (len === maxMiddles) {
-		await downloadTemplate(options);
-	}
-	//* 3.0.0其他 先拉取模版项目，
-	//* 3.1.0再进行改造
-	else {
-		try {
-			// await downloadTemplate(options, 'template');
-			const task = new TaskManager();
-			task.add(createComponentsPackageTask()); //✅ 创建 components 文件夹
-			task.add(createCompnentFile(options, getRoot())); //✅ 创建勾选组件 -> 现在只是简单的组件文件 -> //todo 递归创建 整个文件夹下的所有文件
-
-			await task.execute();
-			log(chalk.hex('#7FFF00').bold(`cd ./${options.packageName} && nodemon index.js`));
-			log(chalk.hex('#DEADED').bold('happy every day -_-#'));
-		} catch (error) {
-			log(error);
-		}
-	}
-})();
-
-//* 获取项目根路径
-const getRoot = () => {
-	return path.resolve(__dirname, process.cwd(), options.packageName);
-};
-
-//* 创建 components 文件夹
-const createComponentsPackageTask = () => {
-	return new FolderTask({
-		name: 'create components folder',
-		filename: 'components',
-		path: `${getRoot()}/src`,
+#!/usr/bin/env node
+const program = require('commander');
+const pkg = require('../package.json');
+const createProject = require('./lib/create');
+//* 查看版本号
+program.version(pkg.version, '-V, --version').usage('<command> [options]');
+//* 命令行创建
+program
+	.command('create <name>')
+	.description('start build project 🚀')
+	.action((name) => {
+		// console.log('cli-name', name);
+		createProject(name);
 	});
-};
+
+program.parse();
+
+return;
+
+//* 作废代码
+program
+	.command('start <qq>')
+	.option('-f --qq <name>', 'Fruit to be added')
+	.option('-x --xx <name>', 'Fruit to beb added')
+	.description('Start cooking food')
+	.action((food, options) => {
+		console.log(`run start command`);
+		console.log(`argument ${food}`);
+		console.log(`option fruit=${JSON.stringify(options)}`);
+	});
