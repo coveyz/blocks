@@ -1,0 +1,25 @@
+{
+  "name": "box",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./bin/index.js",
+  "bin": "./bin/index.js",
+  "scripts": {
+    "test": "node bin/index"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "chalk": "^2.4.2",
+    "clear": "^0.1.0",
+    "ejs": "^3.1.8",
+    "fs-extra": "^10.1.0",
+    "handlebars": "^4.7.7",
+    "inquirer": "^8.2.2",
+    "ora": "^5.4.0"
+  },
+  "dependencies": {
+    "download-git-repo": "^3.0.2"
+  }
+}
