@@ -18,13 +18,13 @@ program.parse();
 return;
 
 //* 作废代码
-// program
-// 	.command('start <qq>')
-// 	.option('-f --qq <name>', 'Fruit to be added')
-// 	.option('-x --xx <name>', 'Fruit to beb added')
-// 	.description('Start cooking food')
-// 	.action((food, options) => {
-// 		console.log(`run start command`);
-// 		console.log(`argument ${food}`);
-// 		console.log(`option fruit=${JSON.stringify(options)}`);
-// 	});
+program
+	.command('start <qq>')
+	.option('-f --qq <name>', 'Fruit to be added')
+	.option('-x --xx <name>', 'Fruit to beb added')
+	.description('Start cooking food')
+	.action((food, options) => {
+		console.log(`run start command`);
+		console.log(`argument ${food}`);
+		console.log(`option fruit=${JSON.stringify(options)}`);
+	});
