@@ -3,7 +3,7 @@
 ## 功能愿景
   1. 实现 类似VueCLi
   2. 支持 vue create <project name>, vue ui 命令
-  3. 区分命令行创建， UI界面创建的不同
+  3. 区分命令行创建， UI界面创建的不同232132132
   4. 选择功能
      1. 创建 对用的 Router 功能
      2. 实现 lowcode 将对应组件 注入到业务当中
@@ -20,3 +20,19 @@
        4. ...
 
 
+### Usage
+      box create <项目名>
+
+### Install
+```sh
+npm i blocks-setup  -g
+```
+
+
+👤 **coveyz**
+
+* Website: tianjin
+* Github: [@covey](https://github.com/coveyz)
+
+## todo
+    1. 开发中
