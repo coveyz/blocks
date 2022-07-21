@@ -13,6 +13,14 @@ program
 		createProject(name);
 	});
 
+program
+	.command('ui')
+	.description('GUI Project🖌️')
+	.option('-f --other <other>', 'meiyong')
+	.action((options) => {
+		require('./lib/ui')(options);
+	});
+
 program.parse();
 
 return;
