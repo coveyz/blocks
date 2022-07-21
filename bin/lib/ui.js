@@ -1,5 +1,6 @@
 async function ui(options, context = process.cwd()) {
-	console.log('ui', options, context);
+	const host = options.host || 'localhost';
+	console.log('ui', options, context, 'host=>', host);
 }
 
 module.exports = (...args) => {
