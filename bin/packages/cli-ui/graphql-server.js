@@ -1,8 +1,13 @@
 const http = require('http');
 const express = require('express');
 const merge = require('deepmerge');
+const { SubscriptionServer } = require('subscriptions-transport-ws');
+
 const { PubSub } = require('graphql-subscriptions');
 const { gql, ApolloServer } = require('apollo-server-express');
+const { makeExecutableSchema } = require('@graphql-tools/schema');
+const { execute, subscribe } = require('graphql');
+
 const { chalk } = require('./utils/tools');
 
 const load = (file) => {
@@ -40,6 +45,10 @@ const autoCall = (fn, ...context) => {
 	return fn;
 };
 
+const defaultValue = (provided, value) => {
+	return provided == null ? value : provided;
+};
+
 module.exports = async (options, cb = null) => {
 	options = merge({ integratedEngine: false }, options);
 	// console.log('graphql-server.js=>', options);
@@ -52,7 +61,6 @@ module.exports = async (options, cb = null) => {
 	const resolvers = load(options.paths.resolvers);
 	const context = load(options.paths.context);
 	const schemaDirectives = load(options.paths.directives);
-
 	let pubsub;
 	try {
 		pubsub = load(options.paths.pubsub);
@@ -93,7 +101,6 @@ module.exports = async (options, cb = null) => {
 
 	// eslint禁用next line prefer const
 	let subscriptionServer;
-
 	let apolloServerOptions = {
 		typeDefs,
 		resolvers,
@@ -132,7 +139,78 @@ module.exports = async (options, cb = null) => {
 		],
 	};
 
+	// Apollo Engine
+	if (options.enableEngine && options.integratedEngine) {
+		console.log('todo=<', options.enableEngine, options.integratedEngine);
+	} else {
+		apolloServerOptions.engine = false;
+	}
+
+	// Final options
+	apolloServerOptions = merge(apolloServerOptions, defaultValue(options.serverOptions, {}));
+
+	// Apollo Server
+	const server = new ApolloServer(apolloServerOptions);
+
+	const schema = makeExecutableSchema({
+		typeDefs: apolloServerOptions.typeDefs,
+		resolvers: apolloServerOptions.resolvers,
+		schemaExtensions: apolloServerOptions.schemaDirectives,
+	});
+
+	subscriptionServer = SubscriptionServer.create(
+		{
+			schema,
+			execute,
+			subscribe,
+			onConnect: async (connection, websocket) => {
+				console.log('onConnect=>');
+				let contextData = {};
+
+				try {
+					contextData = autoCall(context, {
+						connection,
+						websocket,
+					});
+					contextData = Object.assign({}, contextData, { pubsub });
+				} catch (error) {
+					console.error(error);
+					throw error;
+				}
+
+				return contextData;
+			},
+		},
+		{
+			server: httpServer,
+			path: options.subscriptionsPath,
+		}
+	);
+	await server.start();
+	// Express middleware
+	server.applyMiddleware({
+		app,
+		path: options.graphqlPath,
+		cors: options.cors,
+	});
+	// Start server
+	httpServer.setTimeout(options.timeout);
+
+	httpServer.listen(
+		{
+			host: options.host || 'localhost',
+			port: options.port,
+		},
+		() => {
+			if (!options.quiet) {
+				console.log('todo=>GraphQL Server is running');
+			}
+			cb && cb();
+		}
+	);
+
 	return {
+		apolloServer: server,
 		httpServer,
 	};
 };

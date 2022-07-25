@@ -1,17 +1,17 @@
 const gql = require('graphql-tag');
 
+// extend type Mutation {
+//   consoleLogsClear: [ConsoleLog]
+// }
+
+// extend type Subscription {
+//   consoleLogAdded: ConsoleLog!
+// }
+
 exports.types = gql`
 	extend type Query {
 		consoleLogs: [ConsoleLog]
 		consoleLogLast: ConsoleLog
-	}
-
-	extend type Mutation {
-		consoleLogsClear: [ConsoleLog]
-	}
-
-	extend type Subscription {
-		consoleLogAdded: ConsoleLog!
 	}
 
 	type ConsoleLog {
@@ -36,7 +36,7 @@ exports.resolvers = {
 		consoleLogs: (root, args, context) => console.log('test'),
 	},
 
-	Mutation: {},
+	// Mutation: {},
 
-	Subscription: {},
+	// Subscription: {},
 };

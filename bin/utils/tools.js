@@ -2,6 +2,7 @@ const path = require('path');
 const chalk = require('chalk');
 
 const clone = require('./download');
+const openBrowser = require('./openBrowser');
 
 const log = (content) => console.log(chalk['green'](content));
 const getRoot = (options) => {
@@ -21,4 +22,5 @@ module.exports = {
 	titleCase: (str) => {
 		return str.slice(0, 1).toUpperCase() + str.slice(1).toLowerCase();
 	},
+	openBrowser: (url) => openBrowser(url),
 };

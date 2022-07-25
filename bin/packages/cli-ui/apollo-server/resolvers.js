@@ -13,8 +13,6 @@ const resolvers = [
 		Query: {
 			cwd: () => cwd.get(),
 		},
-		Mutation: {},
-		Subscription: {},
 	},
 ];
 
