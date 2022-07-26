@@ -2,8 +2,24 @@ const shortid = require('shortid');
 const chalk = require('chalk');
 const { openBrowser } = require('../utils/tools');
 const { server, portfinder } = require('../packages/cli-ui/server');
+const { setNotificationCallback } = require('../packages/cli-ui/apollo-server/util/notification');
 
 const log = (content) => console.log(chalk['green'](content));
+
+const simpleCorsValidation = (allowedHost) => {
+	console.log('upgrade-simpleCorsValidation-allowedHost', allowedHost);
+	return function (req, socket) {
+		console.log('upgrade-simpleCorsValidation-return-req', req);
+		console.log('upgrade-simpleCorsValidation-return-socket', socket);
+		const { host, origin } = req.headers;
+
+		const sageOrigins = [host, allowedHost, 'localhost'];
+
+		if (!origin || !sageOrigins.includes(new URL(origin).hostname)) {
+			socket.destroy();
+		}
+	};
+};
 
 async function ui(options, context = process.cwd()) {
 	// console.log('>>>', options);
@@ -57,10 +73,12 @@ async function ui(options, context = process.cwd()) {
 		// 打开浏览器
 		const url = `http://${host}:${port}`;
 		if (!options.quiet) log(`🌠  Ready on ${url}`);
-		const ret = openBrowser(url);
-		console.log('ret=>', ret, '<==type ret ==>', typeof ret);
-		// setNotificationCallback(() => openBrowser(url))
+		// console.log('ret=>', ret, '<==type ret ==>', typeof ret);
+		setNotificationCallback(() => openBrowser(url));
+		openBrowser(url);
 	});
+
+	httpServer.on('upgrade', simpleCorsValidation(host));
 }
 
 module.exports = (...args) => {
