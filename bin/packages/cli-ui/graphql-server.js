@@ -10,12 +10,24 @@ const { execute, subscribe } = require('graphql');
 
 const { chalk } = require('./utils/tools');
 
+const defaultValue = (provided, value) => {
+	return provided == null ? value : provided;
+};
+
 const load = (file) => {
 	const module = require(file);
 	if (module.default) {
 		return module.default;
 	}
 	return module;
+};
+
+const autoCall = (fn, ...context) => {
+	console.log('autoCall=>', fn);
+	if (typeof fn === 'function') {
+		return fn(...context);
+	}
+	return fn;
 };
 
 const processSchema = (typeDefs) => {
@@ -37,24 +49,12 @@ const removeFromSchema = (document, kind, name) => {
 	if (index !== -1) definitions.splice(index, 1);
 };
 
-const autoCall = (fn, ...context) => {
-	// console.log('autoCall=>', fn);
-	if (typeof fn === 'function') {
-		return fn(...context);
-	}
-	return fn;
-};
-
-const defaultValue = (provided, value) => {
-	return provided == null ? value : provided;
-};
-
 module.exports = async (options, cb = null) => {
 	options = merge({ integratedEngine: false }, options);
 	// console.log('graphql-server.js=>', options);
 
 	// express app;
-	const app = new express();
+	const app = express();
 	const httpServer = http.createServer(app);
 	// 自定义 这些 文件
 	let typeDefs = load(options.paths.typeDefs);
@@ -94,6 +94,7 @@ module.exports = async (options, cb = null) => {
 		serverModule(app);
 	} catch (error) {
 		//* 未找到文件
+		console.log('serverModule-error', error);
 	}
 
 	// Apollo server options
@@ -177,7 +178,7 @@ module.exports = async (options, cb = null) => {
 					console.error(error);
 					throw error;
 				}
-
+				// console.log('contextData=>', contextData);
 				return contextData;
 			},
 		},

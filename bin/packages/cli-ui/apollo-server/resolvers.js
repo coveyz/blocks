@@ -2,6 +2,8 @@ const globby = require('globby');
 const merge = require('lodash.merge');
 const { GraphQLJSON } = require('graphql-type-json');
 
+const channels = require('./channels')
+
 process.env.BLOCK_CLI_API_MODE = true;
 
 const resolvers = [
@@ -12,6 +14,11 @@ const resolvers = [
 		// }
 		Query: {
 			cwd: () => cwd.get(),
+		},
+		Subscription: {
+			routeRequested: {
+				subscribe: (parent, args, { pubsub }) => pubsub.asyncIterator(channels.ROUTE_REQUESTED),
+			},
 		},
 	},
 ];
