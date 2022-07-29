@@ -1,6 +1,8 @@
 <template>
-  <div id="app">
+  <div id="app"
+       class="app">
     <router-view />
+    <LocalLoader />
   </div>
 </template>
 
@@ -23,5 +25,14 @@ export default {
 
 
 
-<style lang="scss">
+<style lang="scss" scoped>
+.app {
+  display: flex;
+  flex-direction: column;
+}
+.content {
+  flex: auto 1 1;
+  height: 100%;
+  overflow: hidden;
+}
 </style>

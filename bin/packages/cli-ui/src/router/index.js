@@ -33,12 +33,12 @@ const router = new VueRouter({
 	routes,
 });
 
-// router.beforeEach(async (to, form, next) => {
-// 	if (to.matched.some((m) => m.meta.needProject)) {
+router.beforeEach(async (to, form, next) => {
+	if (to.matched.some((m) => m.meta.needProject)) {
+		console.log('>>>');
+	}
 
-// 	}
-
-// 	next();
-// });
+	next();
+});
 
 export default router;

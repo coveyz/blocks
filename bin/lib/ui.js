@@ -9,13 +9,13 @@ const log = (content) => console.log(chalk['green'](content));
 const simpleCorsValidation = (allowedHost) => {
 	console.log('upgrade-simpleCorsValidation-allowedHost', allowedHost);
 	return function (req, socket) {
-		console.log('upgrade-simpleCorsValidation-return-req', req);
-		console.log('upgrade-simpleCorsValidation-return-socket', socket);
+		// console.log('upgrade-simpleCorsValidation-return-req', req);
+		// console.log('upgrade-simpleCorsValidation-return-socket', socket);
 		const { host, origin } = req.headers;
-
 		const sageOrigins = [host, allowedHost, 'localhost'];
 
 		if (!origin || !sageOrigins.includes(new URL(origin).hostname)) {
+			console.log('socket-destroy');
 			socket.destroy();
 		}
 	};
@@ -29,7 +29,7 @@ async function ui(options, context = process.cwd()) {
 		port = await portfinder.getPortPromise();
 	}
 	// config
-	process.env.BLOCK_APP_CLI_UI_URL = '';
+	process.env.VUE_APP_CLI_UI_URL = '';
 	const nodeEnv = process.env.NODE_ENV;
 	// Optimize express
 	process.env.NODE_ENV = 'production';

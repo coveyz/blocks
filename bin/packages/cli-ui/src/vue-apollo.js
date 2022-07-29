@@ -9,7 +9,8 @@ import clientStateTypeDefs from '@/state/typeDefs';
 
 import LOADING_CHANGE from '@/graphql/loading/loadingChange.gql';
 import DARK_MODE_SET from '@/graphql/dark-mode/darkModeSet.gql';
-// import PROJECT_CURRENT from '@/graphql/project/projectCurrent.gql';
+import PROJECT_CURRENT from '@/graphql/project/projectCurrent.gql';
+import CURRENT_PROJECT_ID_SET from './graphql/project/currentProjectIdSet.gql';
 import CONNECTED_SET from '@/graphql/connected/connectedSet.gql';
 
 import { getForcedTheme } from '@/utils/theme';
@@ -86,14 +87,28 @@ const sendConneted = (value) => {
 
 const resetApollo = async () => {
 	console.log('[UI] Apollo store reset');
-	// const {
-	// 	data: { projectCurrent },
-	// } = await apolloClient.query({
-	// 	query: PROJECT_CURRENT,
-	// 	fetchPolicy: 'network-only',
-	// });
+	const {
+		data: { projectCurrent },
+	} = await apolloClient.query({
+		query: PROJECT_CURRENT,
+		fetchPolicy: 'network-only',
+	});
+	const projectId = projectCurrent.id;
 
-	// const projectId = projectCurrent.id;
+	try {
+		await apolloClient.resetStore();
+	} catch (error) {
+		// 潜在错误
+	}
+
+	await apolloClient.mutate({
+		mutation: CURRENT_PROJECT_ID_SET,
+		variables: {
+			projectId,
+		},
+	});
+
+	loadDarkMode();
 };
 
 wsClient.on('connected', () => {

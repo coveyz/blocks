@@ -1,4 +1,5 @@
 import './plugins';
+import './register-components';
 
 import Vue from 'vue';
 import App from './App.vue';
