@@ -1,0 +1,16 @@
+@import './import.scss';
+
+html,
+body,
+#app,
+.page {
+	height: 100%;
+}
+
+h2 {
+	line-height: 32px;
+}
+
+ui {
+	padding-left: $padding-item;
+}

@@ -8,17 +8,17 @@
 
 
 <script>
-// import ROUTE_REQUESTED from '@/graphql/app/routeRequested.gql'
+import ROUTE_REQUESTED from '@/graphql/app/routeRequested.gql'
 export default {
   apollo: {
-    // $subscribe: {
-    //   routeRequested: {
-    //     query: ROUTE_REQUESTED,
-    //     result({ data }) {
-    //       console.log('result=>', data)
-    //     }
-    //   }
-    // }
+    $subscribe: {
+      routeRequested: {
+        query: ROUTE_REQUESTED,
+        result({ data }) {
+          console.log('result=>', data)
+        }
+      }
+    }
   }
 }
 </script>
@@ -26,6 +26,7 @@ export default {
 
 
 <style lang="scss" scoped>
+@import '@/style/main.scss';
 .app {
   display: flex;
   flex-direction: column;

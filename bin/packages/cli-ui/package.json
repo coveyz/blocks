@@ -43,6 +43,8 @@
     "lodash.merge": "^4.6.2",
     "lowdb": "^1.0.0",
     "portfinder": "^1.0.28",
+    "stylus": "^0.58.1",
+    "stylus-loader": "^7.0.0",
     "subscriptions-transport-ws": "0.9.16",
     "vue": "^2.6.11",
     "vue-apollo": "3.0.7",

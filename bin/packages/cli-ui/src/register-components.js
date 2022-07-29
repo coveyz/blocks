@@ -9,8 +9,6 @@ requireCompnents.keys().forEach((fileName) => {
 	// console.log('componentConfig=>', componentConfig);
 
 	const componentName = fileName.substr(fileName.lastIndexOf('/') + 1).replace(/\.\w+$/, '');
-
 	// console.log('💣💣💣💣💣💣', componentName);
-
 	Vue.component(componentName, componentConfig.default || componentConfig);
 });

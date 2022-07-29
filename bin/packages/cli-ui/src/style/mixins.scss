@@ -1,0 +1,16 @@
+@mixin flex-box {
+	display: flex;
+	& > * {
+		flex: auto 0 0;
+	}
+}
+
+@mixin h-box {
+	@include flex-box;
+	flex-direction: column;
+}
+
+@mixin v-box {
+	@include flex-box;
+	flex-direction: column;
+}

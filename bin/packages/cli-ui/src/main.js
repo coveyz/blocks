@@ -8,6 +8,7 @@ import store from './store';
 import gql from 'graphql-tag';
 import { apolloProvider } from './vue-apollo';
 import ClientAddonApi from '@/utils/ClientAddonApi.js';
+import '@/style/main.scss';
 
 window.gql = gql;
 Vue.config.productionTip = false;

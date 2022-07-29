@@ -1,6 +1,6 @@
 import Vue from 'vue';
-//! delete 删除
 import VueRouter from 'vue-router';
+//! delete 删除
 import Home from '../views/Home.vue';
 
 import ProjectSelect from '@/views/project-manager/project-select.vue';

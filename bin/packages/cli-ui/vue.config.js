@@ -12,6 +12,5 @@ module.exports = {
 			symlinks: false,
 		},
 	},
-
 	parallel: !process.env.CIRCLECI,
 };
