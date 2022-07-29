@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import VueUi from '@vue/ui';
 import Responsive from '@/utils/responsive';
 
 Vue.use(Responsive, {
@@ -17,3 +18,5 @@ Vue.use(Responsive, {
 		},
 	},
 });
+
+Vue.use(VueUi);

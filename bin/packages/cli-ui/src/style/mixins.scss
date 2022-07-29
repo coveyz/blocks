@@ -14,3 +14,8 @@
 	@include flex-box;
 	flex-direction: column;
 }
+
+@mixin box-center {
+	align-items: center;
+	justify-content: center;
+}

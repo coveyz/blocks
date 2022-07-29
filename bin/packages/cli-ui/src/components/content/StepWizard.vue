@@ -10,6 +10,15 @@
           </div>
         </div>
       </div>
+
+      <VueTabs ref="tabs"
+               class="main-tabs"
+               group-class="accent"
+               v-bind="$attrs"
+               v-on="$listeners">
+        <slot :next="next"
+              :previous="previous" />
+      </VueTabs>
     </div>
   </div>
 </template>
@@ -61,6 +70,10 @@ export default {
     font-size: 24px;
     text-align: center;
     font-weight: 300;
+  }
+  .main-tabs {
+    height: 0;
+    flex: auto 1 1;
   }
 }
 </style>

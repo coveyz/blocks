@@ -1,4 +1,5 @@
 @import './import.scss';
+@import '~@vue/ui/dist/vue-ui.css';
 
 html,
 body,
@@ -13,4 +14,32 @@ h2 {
 
 ui {
 	padding-left: $padding-item;
+}
+
+.actions-bar {
+	padding: $padding-item;
+	@include h-box;
+	@include box-center;
+	position: relative;
+	> * {
+		justify-content: space-between;
+	}
+	&.space-between {
+		justify-content: space-between;
+	}
+	&.center {
+		justify-content: center;
+	}
+	&.start {
+		justify-content: flex-start;
+	}
+	&.end {
+		justify-content: flex-end;
+	}
+	&.fill {
+		> * {
+			flex: auto 1 1;
+			width: 0;
+		}
+	}
 }

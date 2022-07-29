@@ -26,7 +26,8 @@ export default {
 
 
 <style lang="scss" scoped>
-@import '@/style/main.scss';
+// @import '~@vue/ui/dist/vue-ui.css';
+
 .app {
   display: flex;
   flex-direction: column;
