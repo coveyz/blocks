@@ -66,7 +66,7 @@ export const apolloProvider = new VueApollo({
 	// 所有智能查询和订阅的全局错误处理函数
 	errorHandler(error) {
 		console.log('%cAn error occurred', 'background: red; color: white; padding: 4px; border-radius: 4px;font-weight: bold;');
-		console.log(error.message);
+		console.log('errorHandler', error.message);
 		if (error.graphQLErrors) {
 			console.log(error.graphQLErrors);
 		}
@@ -99,6 +99,7 @@ const resetApollo = async () => {
 		await apolloClient.resetStore();
 	} catch (error) {
 		// 潜在错误
+		console.log('💣💣💣💣💣💣💣💣');
 	}
 
 	await apolloClient.mutate({

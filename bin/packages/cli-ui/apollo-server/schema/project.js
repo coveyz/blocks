@@ -5,6 +5,7 @@ const projects = require('../connectors/project');
 exports.types = gql`
 	extend type Query {
 		projectCurrent: Project
+		projects: [Project]
 	}
 
 	type Project {
@@ -19,14 +20,18 @@ exports.types = gql`
 		openDate: JSON
 	}
 
-  enum ProjectType {
-    vue
-    unknown
-  }
+	enum ProjectType {
+		vue
+		unknown
+	}
 `;
 
 exports.resolvers = {
+  Project: {
+
+  },
 	Query: {
 		projectCurrent: (root, args, context) => projects.getCurrent(context),
+		projects: (root, args, context) => projects.list(context),
 	},
 };

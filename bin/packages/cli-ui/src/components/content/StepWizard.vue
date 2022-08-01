@@ -61,6 +61,7 @@ export default {
     height: 100%;
   }
   .header {
+    background-color: $content-bg-primary-light;
     .content {
       margin: 0 auto;
     }
@@ -74,6 +75,15 @@ export default {
   .main-tabs {
     height: 0;
     flex: auto 1 1;
+  }
+  .headr,
+  ::v-deep .tabs {
+    background-color: $content-bg-primary-light;
+    .vue-ui-dark-mode {
+      & {
+        background-color: red;
+      }
+    }
   }
 }
 </style>

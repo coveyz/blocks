@@ -26,7 +26,6 @@ export default {
 
 
 <style lang="scss" scoped>
-// @import '~@vue/ui/dist/vue-ui.css';
 
 .app {
   display: flex;

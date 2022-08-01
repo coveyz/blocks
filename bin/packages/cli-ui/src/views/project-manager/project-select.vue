@@ -8,7 +8,7 @@
               label="项目"
               icon="storage"
               class="select">
-        project-select-list
+        <ProjectSelectList />
       </VueTab>
 
       <VueTab id="create"
@@ -16,7 +16,7 @@
               icon="add_box"
               class="create">
         <div class="content">
-          FolderExplorer
+          <FolderExplorer />
         </div>
         <div class="actions-bar center">
           <VueButton icon-left="add"
