@@ -14,23 +14,27 @@ const typeDefs = [
 		}
 		type Subscription {
 			routeRequested: JSON!
+      cwdChanged: String!
 		}
-    type GitHubStats {
-      stars: Int
+    type Mutation {
+		  folderOpen(path: String!): Folder
     }
+		type GitHubStats {
+			stars: Int
+		}
 		interface DescribedEntity {
 			name: String
 			description: String
 			link: String
 		}
 
-    type Version {
-      current: String
-      latest: String
-      wanted: String
-      range: String
-      localPath: String
-    }
+		type Version {
+			current: String
+			latest: String
+			wanted: String
+			range: String
+			localPath: String
+		}
 	`,
 ];
 const paths = globby.sync(['./schema/*.js'], { cwd: __dirname, absolute: true });

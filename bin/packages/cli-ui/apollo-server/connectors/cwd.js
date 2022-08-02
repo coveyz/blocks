@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const channels = require('../channels');
 
-let cwd = process.cwd;
+let cwd = process.cwd();
 
 const normalize = (value) => {
 	if (value.length === 1) return value;
@@ -13,6 +13,7 @@ const normalize = (value) => {
 		value = value.substr(0, value.length - 1);
 	}
 
+  console.log('cwd-normalize-value=>',value)
 	return value;
 };
 

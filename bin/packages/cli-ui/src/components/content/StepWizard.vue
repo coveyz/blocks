@@ -85,5 +85,36 @@ export default {
       }
     }
   }
+  ::v-deep .vue-ui-tab {
+    margin: 0 auto;
+    padding: $padding-item $padding-item 0;
+    box-sizing: border-box;
+  }
+  &,
+  ::v-deep .vue-ui-tab {
+    height: 100%;
+  }
+
+  ::v-deep .tabs-content {
+    height: 0;
+    flex: auto 1 1;
+  }
+
+  &,
+  ::v-deep .vue-ui-tab,
+  ::v-deep .vue-ui-tab-content {
+    height: 100%;
+  }
+
+  ::v-deep .vue-ui-tab-content {
+    overflow-y: hidden;
+    @include v-box;
+    margin: 0 auto;
+    > .content {
+      flex: 100% 1 1;
+      height: 0;
+      overflow-y: auto;
+    }
+  }
 }
 </style>

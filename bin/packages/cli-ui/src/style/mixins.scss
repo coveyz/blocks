@@ -7,7 +7,7 @@
 
 @mixin h-box {
 	@include flex-box;
-	flex-direction: column;
+	flex-direction: row;
 }
 
 @mixin v-box {
