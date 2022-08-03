@@ -4,6 +4,7 @@ const getContext = require('../context');
 const { chalk } = require('../../utils/tools');
 
 let currentProject = null;
+let creator = null;
 
 const log = (...args) => {
 	if (!process.env.VUE_APP_CLI_UI_DEBUG) return;
@@ -63,9 +64,20 @@ async function autoOpenLastProject() {
 	}
 }
 
+function initCreator() {}
+
+async function getCreation(context) {
+	return console.log('todo-getCreation', context);
+	if (!creator) {
+		creator = await initCreator();
+	}
+	// return generateProjectCreation(creator)
+}
+
 autoOpenLastProject();
 
 module.exports = {
 	getCurrent,
 	list,
+	getCreation,
 };

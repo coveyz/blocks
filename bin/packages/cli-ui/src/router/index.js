@@ -4,6 +4,7 @@ import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
 
 import ProjectSelect from '@/views/project-manager/project-select.vue';
+import ProjectCreate from '@/views/project-manager/project-create.vue';
 
 Vue.use(VueRouter);
 
@@ -25,6 +26,11 @@ const routes = [
 		path: '/project/select',
 		name: 'project-select',
 		component: ProjectSelect,
+	},
+	{
+		path: '/project/create',
+		name: 'project-create',
+		component: ProjectCreate,
 	},
 ];
 

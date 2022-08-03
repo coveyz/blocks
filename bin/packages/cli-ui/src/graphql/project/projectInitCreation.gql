@@ -1,0 +1,7 @@
+#import './projectFragment.gql'
+
+mutation projectInitCreation {
+	projectInitCreation {
+		...projectCreation
+	}
+}

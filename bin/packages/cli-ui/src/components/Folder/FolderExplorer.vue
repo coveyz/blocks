@@ -22,7 +22,7 @@
           <div class="path_value"
                v-if="data">
             <div class="path_part"
-                 v-for="(slice,index) in slicePath(data.cwd)"
+                 v-for="(slice,index) in slicePath(data.cwd,data)"
                  :key="index">
               <VueButton class="path_folder flat"
                          :class="{
@@ -36,6 +36,18 @@
           </div>
         </template>
       </ApolloQuery>
+      <VueButton class="icon-button"
+                 icon-left="refresh" />
+      <VueDropdown placement="bottom-end">
+        <VueButton slot="trigger"
+                   icon-left="more_vert"
+                   class="icon-button" />
+        <VueSwitch icon="visibility"
+                   v-model="showHidden"
+                   class="extend-left">
+          现实隐藏文件
+        </VueSwitch>
+      </VueDropdown>
     </div>
     <!-- 文件展示 📃 -->
     <div class="folders"
@@ -61,6 +73,7 @@
 // import { isValidName } from '@/utils/folders'
 import FOLDER_OPEN from '@/graphql/folder/folderOpen.gql'
 import FOLDER_CURRENT from '@/graphql/folder/folderCurrent.gql'
+import FOLDER_OPEN_PARENT from '@/graphql/folder/folderOpenParent.gql'
 
 const SHOW_HIDDEN = 'vue-ui.show-hidden-folders'
 
@@ -91,7 +104,22 @@ export default {
       return tip
     },
     openParentFolder() {
-
+      this.editingPath = false;
+      this.error = null;
+      this.loading++
+      try {
+        this.$apollo.mutate({
+          mutation: FOLDER_OPEN_PARENT,
+          update: (store, { data: { folderOpenParent } }) => {
+            console.log('openParentFolder-FOLDER_OPEN_PARENT-update=>', folderOpenParent, '-store=>', store)
+            store.writeQuery({ query: FOLDER_CURRENT, data: { folderCurrent: folderOpenParent } })
+          }
+        })
+      } catch (error) {
+        this.error = error;
+        console.log('openParentFolder-error=>', error)
+      }
+      this.loading--
     },
     openpathEdit() {
 
@@ -137,7 +165,7 @@ export default {
     },
     // 打开文件
     async openFolder(path) {
-      console.log('openFolder-path=>', path)
+      // console.log('openFolder-path=>', path)
       this.editingPath = false
       this.error = null
       this.loading++
@@ -169,6 +197,10 @@ export default {
   @include h-box;
   align-items: center;
   ::v-deep > * {
+    margin-right: $padding-item;
+  }
+  ::v-deep > *:nth-last-child(1) {
+    margin-right: 0;
   }
 }
 .editingPath {

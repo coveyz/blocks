@@ -14,11 +14,12 @@ const typeDefs = [
 		}
 		type Subscription {
 			routeRequested: JSON!
-      cwdChanged: String!
+			cwdChanged: String!
 		}
-    type Mutation {
-		  folderOpen(path: String!): Folder
-    }
+		type Mutation {
+			folderOpen(path: String!): Folder
+			folderOpenParent: Folder
+		}
 		type GitHubStats {
 			stars: Int
 		}

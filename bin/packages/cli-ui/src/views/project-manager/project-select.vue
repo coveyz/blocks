@@ -30,6 +30,7 @@
 </template>
 
 <script>
+
 export default {
   data() {
     return {
@@ -40,8 +41,12 @@ export default {
     }
   },
   methods: {
-    createProject() {
+    async createProject() {
       console.log('createProject')
+      /* todo
+          @graphql project
+      */
+      this.$router.push({ name: 'project-create' })
     }
   },
 }

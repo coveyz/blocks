@@ -1,3 +1,10 @@
+@mixin ellipsis() {
+	overflow: hidden;
+	-ms-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
 @mixin flex-box {
 	display: flex;
 	& > * {

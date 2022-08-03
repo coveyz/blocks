@@ -1,6 +1,7 @@
 const gql = require('graphql-tag');
 // Connectors
 const folders = require('../connectors/folders');
+const cwd = require('../connectors/cwd');
 
 exports.types = gql`
 	type Folder {
@@ -25,11 +26,13 @@ exports.types = gql`
 exports.resolvers = {
 	Folder: {
 		children: (folder, args, context) => folders.list(folder.path, context),
+		isPackage: (folder, args, context) => folders.isPackage(folder.path, context),
 	},
 	Query: {
 		folderCurrent: (root, args, context) => folders.getCurrent(args, context),
 	},
 	Mutation: {
 		folderOpen: (rooet, { path }, context) => folders.open(path, context),
+		folderOpenParent: (root, args, context) => folders.openParent(cwd.get(), context),
 	},
 };

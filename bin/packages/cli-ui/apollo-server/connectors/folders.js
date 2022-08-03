@@ -8,6 +8,7 @@ const isPlatformWindows = process.platform.indexOf('win') === 0;
 // 生成文件夹
 function generateFolder(file, context) {
 	console.log('generateFolder🍕', file);
+
 	return {
 		name: path.basename(file),
 		path: file,
@@ -17,6 +18,14 @@ function generateFolder(file, context) {
 // 打开文件夹
 function open(file, context) {
 	cwd.set(file, context);
+	return generateFolder(cwd.get(), context);
+}
+// 打开父级文件夹
+function openParent(file, context) {
+	// console.log('openParent-file=>', file); 
+	const newFile = path.dirname(file); // 获取 当前文件 所在的文件夹路径
+	// console.log('openParent-newFile=>', newFile);
+	cwd.set(newFile, context);
 	return generateFolder(cwd.get(), context);
 }
 
@@ -96,10 +105,22 @@ function isHidden(file) {
 	}
 }
 
+function isPackage(file) {
+	try {
+		return fs.existsSync(path.join(file, 'package.json'));
+	} catch (error) {
+		console.warn(error.message);
+	}
+
+	return false;
+}
+
 module.exports = {
 	open,
+	openParent,
 	getCurrent,
 	list,
 	isDirectory,
 	isHidden,
+	isPackage,
 };
