@@ -40,6 +40,7 @@ export default {
     next() {
       const tabs = this.$refs.tabs;
       console.log('next-tabs', tabs)
+      tabs.activateChild(tabs.activeChildIndex + 1)
     },
     previous() {
       const tabs = this.$refs.tabs;
@@ -114,6 +115,12 @@ export default {
       flex: 100% 1 1;
       height: 0;
       overflow-y: auto;
+    }
+    > .actions_bar {
+      justify-content: center;
+      .vue-ui-button:not(.icon-button) {
+        min-width: 190px;
+      }
     }
   }
 }

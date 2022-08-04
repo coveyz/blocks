@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import VueUi from '@vue/ui';
 import Responsive from '@/utils/responsive';
+import * as Filters from './filters';
 
 Vue.use(Responsive, {
 	computed: {
@@ -18,5 +19,9 @@ Vue.use(Responsive, {
 		},
 	},
 });
+
+for (const filter in Filters) {
+	Vue.filter(filter, Filters[filter]);
+}
 
 Vue.use(VueUi);

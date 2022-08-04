@@ -4,11 +4,13 @@
       <StepWizard title="创建新项目"
                   class="frame">
         <!-- <template slot-scope="{next,previous}"> -->
-        <template>
+        <template slot-scope="{ next }">
+          <!-- <template> -->
           <VueTab id="detaild"
                   class="details"
                   label="详情"
                   icon="subject">
+            <!-- 操作流程 -->
             <div class="content vue-ui-disable-scroll">
               <div class="project-details vue-ui-grid col-1">
                 <VueFormField title="项目文件夹">
@@ -16,22 +18,77 @@
                             icon-left="folder"
                             class="big app-name"
                             placeholder="输入项目名" />
+                  <div slot="subtitle">
+                    <div class="project_path">
+                      <div class="path">
+                        <span class="cwd">
+                          {{cwd | folder(42 - formData.folder.length )}}
+                        </span>
+                        <span class="folder">
+                          {{formData.folder}}
+                        </span>
+                      </div>
+
+                    </div>
+                  </div>
                 </VueFormField>
               </div>
             </div>
+
+            <!-- 按钮 操作栏 -->
+            <div class="actions_bar">
+              <VueButton icon-left="close"
+                         label="取消"
+                         class="big close"
+                         @click="showCancel=true" />
+              <VueButton icon-right="arrow_forward"
+                         label="下一步"
+                         class="big primary next"
+                         :disabled="!detailsValid"
+                         @click="next()" />
+            </div>
           </VueTab>
 
+          <VueTab id="presets"
+                  class="presets"
+                  label="预设"
+                  icon="check_circle"
+                  :disabled="!detailsValid"
+                  lazy>
+            预设
+          </VueTab>
         </template>
       </StepWizard>
     </div>
+
+    <VueModal v-if="showCancel"
+              title="取消创建项目"
+              class="small"
+              @close="showCancel=false">
+      <div class="default-body">
+        确定要取消创建吗？
+      </div>
+      <div slot="footer"
+           class="actions end">
+        <VueButton label="不"
+                   class="flat"
+                   @click="showCancel = false" />
+
+        <VueButton :to="{ name: 'project-select' }"
+                   label="取消创建"
+                   icon-left="delete_forever"
+                   class="danger" />
+      </div>
+    </VueModal>
   </div>
 </template>
 
 <script>
+import validateNpmPackageName from 'validate-npm-package-name'
 // import Prompts from '@/mixins/Prompts'
 
 // import PROJECT_CREATION from '@/graphql/projectCreation'
-// import CWD from '@/graphql/cwd/cwd.gql'
+import CWD from '@/graphql/cwd/cwd.gql'
 
 const formDataFactory = () => {
   return {
@@ -53,10 +110,35 @@ const formDataFactory = () => {
 let formData = formDataFactory()
 
 export default {
+  name: 'ProjectCreate',
   // mixins: [Prompts({ field: 'projectCreate', query: PROJECT_CREATION })]
+  apollo: {
+    cwd: {
+      query: CWD,
+      fetchPolicy: 'network-only'
+    }
+  },
   data() {
     return {
-      formData: formData
+      formData: formData,
+      cwd: '',
+      showCancel: false
+    }
+  },
+  computed: {
+    folderNameValidationResult() {
+      return validateNpmPackageName(this.formData.folder)
+    },
+    folderNameValid() {
+      return this.folderNameValidationResult.validForNewPackages
+    },
+    detailsValid() {
+      return !!this.formData.folder && this.folderNameValid
+    }
+  },
+  methods: {
+    next() {
+      console.log('next=>')
     }
   },
 }
@@ -81,5 +163,32 @@ export default {
 }
 ::v-deep .vue-ui-input:not(.flat) > .content {
   background: #f7fcfa;
+}
+.project_path {
+  @include h-box;
+  @include box-center;
+  .path {
+    flex: 100% 1 1;
+    margin-right: 6px;
+    @include h-box;
+    align-items: baseline;
+    .folder {
+      font-weight: bold;
+    }
+  }
+}
+.actions_bar {
+  padding: 16px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  > * {
+    flex: auto 0 0;
+    margin-right: 16px;
+  }
+}
+.default-body {
 }
 </style>
