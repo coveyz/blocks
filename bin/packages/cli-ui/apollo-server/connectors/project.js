@@ -2,9 +2,40 @@ const fs = require('fs');
 // Context
 const getContext = require('../context');
 const { chalk } = require('../../utils/tools');
+const { Creator } = require('../../utils/Creator');
+
+//* Connectors
+const cwd = require('./cwd');
+const progress = require('./progress');
+const prompts = require('./prompts');
+
+const PROGRESS_ID = 'project-create';
+const pluginRE = /^(@vue\/|vue-|@[\w-]+(\.)?[\w-]+\/vue-)cli-plugin-/;
+const toShortPluginId = (id) => id.replace(pluginRE, '');
+const getFeatures = (preset) => {
+	const features = [];
+	if (preset.router) {
+		features.push('router');
+	}
+	if (preset.vuex) {
+		features.push('vuex');
+	}
+	if (preset.cssPreprocessor) {
+		features.push(preset.cssPreprocessor);
+	}
+	const plugins = Object.keys(preset.plugins).filter((dep) => {
+		return dep !== '@vue/cli-service';
+	});
+	features.push.apply(features, plugins);
+	return features;
+};
 
 let currentProject = null;
 let creator = null;
+let onCreationEvent = null;
+let presets = [];
+let features = []
+
 
 const log = (...args) => {
 	if (!process.env.VUE_APP_CLI_UI_DEBUG) return;
@@ -64,14 +95,83 @@ async function autoOpenLastProject() {
 	}
 }
 
-function initCreator() {}
+function generateProjectCreation() {
+	return {
+		presets,
+	};
+}
+
+function generatePresetDescription(preset) {
+	let description = `[Vue ${preset.raw.vueVersion || 2}] `;
+
+	description += preset.features.join(', ');
+	if (preset.raw.useConfigFiles) {
+		description += ' (Use config files)';
+	}
+	return description;
+}
+
+async function initCreator(context) {
+	// const creator = new Creator('', cwd.get(), getPromptModules())
+	// console.log('init');
+	const creator = new Creator('', cwd.get());
+	// console.log('initCreator=>', creator);
+
+	// 发出创建事件
+	onCreationEvent = ({ event }) => {
+		console.log('onCreationEvent=>');
+		progress.set({ id: PROGRESS_ID, status: event, info: null }, context);
+	};
+
+	creator.on('create', onCreationEvent);
+
+	const presetsData = creator.getPresets();
+	// console.log('presetsData=?', presetsData);
+	// console.log('keys=>?', Object.keys(presetsData));
+	presets = [
+		...Object.keys(presetsData).map((key) => {
+			const preset = presetsData[key];
+			const features = getFeatures(preset).map((f) => toShortPluginId(f));
+			let name = key;
+			if (key === 'default') {
+				name = 'org.vue.views.project-create.tabs.presets.default-preset';
+			} else if (key === '__default_vue_3__') {
+				name = 'org.vue.views.project-create.tabs.presets.default-preset-vue-3';
+			}
+			const info = {
+				id: key,
+				name,
+				features,
+				link: null,
+				raw: preset,
+			};
+			info.description = generatePresetDescription(info);
+			return info;
+		}),
+	];
+	// console.log('presets=>', presets);
+	// await prompts.reset()
+
+	await prompts.reset();
+	creator.injectedPrompts.forEach(prompts.add);
+	await updatePromptsFeatures();
+	prompts.start();
+
+	return creator;
+}
+
+async function updatePromptsFeatures() {
+	await prompts.changeAnswers((answers) => {
+		answers.features = features.filter((f) => f.enabled).map((f) => f.id);
+	});
+}
 
 async function getCreation(context) {
-	return console.log('todo-getCreation', context);
 	if (!creator) {
-		creator = await initCreator();
+		creator = await initCreator(context);
 	}
-	// return generateProjectCreation(creator)
+
+	return generateProjectCreation(creator);
 }
 
 autoOpenLastProject();

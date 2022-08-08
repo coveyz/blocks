@@ -55,7 +55,26 @@
                   icon="check_circle"
                   :disabled="!detailsValid"
                   lazy>
-            预设
+            <div class="content vue-ui-disable-scroll">
+              <div class="vue-ui-text info banner">
+                <VueIcon icon="info"
+                         class="big" />
+                <span>
+                  预设就是一套定义好的插件和配置。 你也可以将自己的配置保存成预设，方便以后创建项目使用。
+                </span>
+              </div>
+              <div class="cta-text">
+                选择一套预设
+              </div>
+              <template v-if="projectCreation">
+                <ProjectPresetItem v-for="preset in projectCreation.presets"
+                                   :key="preset.id"
+                                   :preset="preset"
+                                   :selected="formData.selectedPreset === preset.id"
+                                   @click.native="selectPreset(preset.id)" />
+
+              </template>
+            </div>
           </VueTab>
         </template>
       </StepWizard>
@@ -87,7 +106,7 @@
 import validateNpmPackageName from 'validate-npm-package-name'
 // import Prompts from '@/mixins/Prompts'
 
-// import PROJECT_CREATION from '@/graphql/projectCreation'
+import PROJECT_CREATION from '@/graphql/project/projectCreation.gql'
 import CWD from '@/graphql/cwd/cwd.gql'
 
 const formDataFactory = () => {
@@ -116,13 +135,18 @@ export default {
     cwd: {
       query: CWD,
       fetchPolicy: 'network-only'
+    },
+    projectCreation: {
+      query: PROJECT_CREATION,
+      fetchPolicy: 'network-only'
     }
   },
   data() {
     return {
       formData: formData,
       cwd: '',
-      showCancel: false
+      showCancel: false,
+      projectCreation: null
     }
   },
   computed: {
@@ -139,6 +163,9 @@ export default {
   methods: {
     next() {
       console.log('next=>')
+    },
+    selectPreset(id) {
+      console.log('formdata=>', this.formData, '<==id=>', id)
     }
   },
 }
@@ -160,6 +187,9 @@ export default {
   width: 100%;
   margin: 42px auto;
   grid-gap: ($padding-item * 3);
+  .vue-ui-text .banner {
+    margin-top: 6px;
+  }
 }
 ::v-deep .vue-ui-input:not(.flat) > .content {
   background: #f7fcfa;

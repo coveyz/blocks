@@ -1,5 +1,5 @@
 export const folder = (value, maxLength = -1) => {
-	console.log('filter-folder', maxLength);
+	// console.log('filter-folder', maxLength);
 	value = value.replace(/\\/g, '/');
 
 	if (value.charAt(value.length - 1) !== '/') {
