@@ -8,11 +8,11 @@
       <div class="radio-icon">
         <VueIcon :icon="selected ? 'radio_button_checked' : 'radio_button_unchecked'"
                  class="medium" />
-        <ListItemInfo :name="preset.name"
-                      :description="description || preset.description"
-                      :link="preset.link"
-                      :selected="selected" />
       </div>
+      <ListItemInfo :name="preset.name"
+                    :description="description || preset.description"
+                    :link="preset.link"
+                    :selected="selected" />
     </div>
   </div>
 </template>
@@ -59,7 +59,7 @@ export default {
   &.selected {
     .radio-icon {
       ::v-deep svg {
-        fill: #f7fcfa;
+        fill: #42b983;
       }
     }
   }

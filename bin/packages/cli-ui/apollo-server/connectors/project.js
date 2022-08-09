@@ -3,6 +3,7 @@ const fs = require('fs');
 const getContext = require('../context');
 const { chalk } = require('../../utils/tools');
 const { Creator } = require('../../utils/Creator');
+const { getPromptModules } = require('../../utils/createTools');
 
 //* Connectors
 const cwd = require('./cwd');
@@ -34,8 +35,7 @@ let currentProject = null;
 let creator = null;
 let onCreationEvent = null;
 let presets = [];
-let features = []
-
+let features = [];
 
 const log = (...args) => {
 	if (!process.env.VUE_APP_CLI_UI_DEBUG) return;
@@ -98,6 +98,7 @@ async function autoOpenLastProject() {
 function generateProjectCreation() {
 	return {
 		presets,
+		features,
 	};
 }
 
@@ -111,10 +112,19 @@ function generatePresetDescription(preset) {
 	return description;
 }
 
+// 手动 preset
+const manualPreset = {
+	id: '__manual__',
+	name: '手动',
+	description: '手动配置项',
+	link: null,
+	features: [],
+};
+
 async function initCreator(context) {
 	// const creator = new Creator('', cwd.get(), getPromptModules())
 	// console.log('init');
-	const creator = new Creator('', cwd.get());
+	const creator = new Creator('', cwd.get(), getPromptModules());
 	// console.log('initCreator=>', creator);
 
 	// 发出创建事件
@@ -148,9 +158,36 @@ async function initCreator(context) {
 			info.description = generatePresetDescription(info);
 			return info;
 		}),
+		manualPreset,
 	];
 	// console.log('presets=>', presets);
 	// await prompts.reset()
+
+	// Features
+	const featuresData = creator.featurePrompt.choices;
+
+	features = [
+		...featuresData.map((data) => ({
+			id: data.value,
+			name: data.name,
+			description: data.description || null,
+			link: data.link || null,
+			plugins: data.plugins || null,
+			enabled: !!data.checked,
+		})),
+		{
+			id: 'use-config-files',
+			name: '使用配置文件',
+			description: `将插件的配置保存在各自的配置文件 (比如 '.babelrc') 中。`,
+			link: null,
+			plugins: null,
+			enabled: false,
+		},
+	];
+
+	manualPreset.features = features.filter((f) => f.enabled).map((f) => f.id);
+	// console.log('featuresData=>', featuresData);
+	// console.log('features=>', features);
 
 	await prompts.reset();
 	creator.injectedPrompts.forEach(prompts.add);

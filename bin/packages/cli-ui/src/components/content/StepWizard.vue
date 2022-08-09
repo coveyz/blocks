@@ -45,6 +45,7 @@ export default {
     previous() {
       const tabs = this.$refs.tabs;
       console.log('previous-tabs', tabs)
+      tabs.activateChild(tabs.activeChildIndex - 1)
 
     }
   },

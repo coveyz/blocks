@@ -3,8 +3,8 @@
     <div class="content">
       <StepWizard title="创建新项目"
                   class="frame">
-        <!-- <template slot-scope="{next,previous}"> -->
-        <template slot-scope="{ next }">
+        <template slot-scope="{next,previous}">
+          <!-- <template slot-scope="{ next }"> -->
           <!-- <template> -->
           <VueTab id="detaild"
                   class="details"
@@ -71,11 +71,62 @@
                                    :key="preset.id"
                                    :preset="preset"
                                    :selected="formData.selectedPreset === preset.id"
-                                   @click.native="selectPreset(preset.id)" />
+                                   @click.native="selectPreset(preset)" />
 
               </template>
+
+              <div class="actions_bar">
+                <VueButton icon-left="arrow_back"
+                           label="上一步"
+                           class="big previous"
+                           @click="previous()" />
+
+                <VueButton v-if="manual"
+                           icon-right="arrow_forward"
+                           label="下一步"
+                           class="big primary next"
+                           :disabled="!presetValid"
+                           @click="next()" />
+                <VueButton v-else
+                           icon-left="done"
+                           label="创建项目"
+                           class="big primary next"
+                           :disabled="!formData.selectedPreset"
+                           @click="createWithoutSaving()" />
+              </div>
             </div>
           </VueTab>
+
+          <!-- 🔧 功能  ✅-->
+          <VueTab id="features"
+                  class="features"
+                  icon="device_hub"
+                  :disabled="!detailsValid || !presetValid || !manual"
+                  lazy
+                  label="功能">
+            <div class="content vue-ui-disable-scroll">
+              <div class="vue-ui-text info banner">
+                <VueIcon icon="info"
+                         class="big" />
+                <span>
+                  在项目创建之后，你仍然可以通过安装插件来增加功能。
+                </span>
+
+              </div>
+              <div class="cta-text">
+                选择功能
+              </div>
+
+              <template v-if="projectCreation">
+                <ProjectFeatureItem v-for="feature of projectCreation['features']"
+                                    :key="feature['id']"
+                                    :feature="feature"
+                                    @click.native="toggleFeature(feature)" />
+              </template>
+
+            </div>
+          </VueTab>
+
         </template>
       </StepWizard>
     </div>
@@ -158,6 +209,12 @@ export default {
     },
     detailsValid() {
       return !!this.formData.folder && this.folderNameValid
+    },
+    presetValid() {
+      return !!this.formData.selectedPreset
+    },
+    manual() {
+      return this.formData.selectedPreset === '__manual__'
     }
   },
   methods: {
@@ -165,7 +222,13 @@ export default {
       console.log('next=>')
     },
     selectPreset(id) {
+      console.log('preset=>', id)
       console.log('formdata=>', this.formData, '<==id=>', id)
+      this.formData.selectedPreset = id.id
+    },
+    createWithoutSaving() { },
+    toggleFeature(feature) {
+      console.log('toggleFeature=>', feature)
     }
   },
 }
