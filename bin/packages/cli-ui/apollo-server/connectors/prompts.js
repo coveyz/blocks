@@ -1,9 +1,42 @@
 let answers = {},
 	prompts = [];
 
+async function getEnabled(value) {
+	console.log('getEnabled=>', value);
+	const type = typeof value;
+	// console.group('getEnabled-answer', answers);
+	// console.group('getEnabled-type', type);
+	if (type === 'function') {
+		const result = await value(answers);
+		// console.log('getEnabled-result=>', result);
+		return !!result;
+	} else if (type === 'boolean') {
+		return value;
+	} else {
+		return true;
+	}
+}
+
+async function getChoices(prompt) {
+	const data = prompt.raw.choices;
+	console.log('getChoices=>', data);
+	if (!data) return null;
+	console.log('todo=>getChoices=>data', data);
+}
+
 async function updatePrompts() {
 	for (const prompt of prompts) {
-		console.log('todo-updatePrompts>', prompt);
+		console.log('updatePrompts-before-prompt->>', prompt);
+		const oldVisible = prompt.visible;
+		prompt.visible = await getEnabled(prompt.raw.when);
+		prompt.choices = await getChoices(prompt);
+		console.log('updatePrompts-after-prompt', prompt);
+
+		if (oldVisible !== prompt.visible && !prompt.visible) {
+			console.log('todo-remove', prompt.id);
+		} else if (prompt.visible && !prompt.valueChanged) {
+			console.log('todo??updatePrompts??', prompt);
+		}
 	}
 
 	console.log('Prompt answers=>', answers);
@@ -45,14 +78,15 @@ async function setAnswers(newAnswers) {
 }
 
 function add(data) {
+	console.log('prompt-add->data=>', data);
 	const prompt = generatePrompt(data);
 	prompts.push(prompt);
 	return prompt;
 }
 
 async function changeAnswers(cb) {
-  cb(answers);
-  await updatePrompts()
+	cb(answers);
+	await updatePrompts();
 }
 
 module.exports = {
@@ -60,5 +94,5 @@ module.exports = {
 	reset,
 	setAnswers,
 	add,
-  changeAnswers
+	changeAnswers,
 };

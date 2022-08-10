@@ -46,6 +46,11 @@ exports.types = gql`
 		projects: [Project]
 		projectCreation: ProjectCreation
 	}
+
+	extend type Mutation {
+		featureSetEnabled(id: ID!, enabled: Boolean): Feature
+		presetApply(id: ID!): ProjectCreation
+	}
 `;
 // projectInitCreation: ProjectCreation
 
@@ -58,5 +63,7 @@ exports.resolvers = {
 	},
 	Mutation: {
 		// projectInitCreation: (root, args, context) => projects.initCreator(context),
+		featureSetEnabled: (root, args, context) => projects.setFeatureEnabled(args, context),
+		presetApply: (root, { id }, context) => projects.applyPreset(id, context),
 	},
 };

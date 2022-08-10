@@ -192,7 +192,7 @@ async function initCreator(context) {
 	await prompts.reset();
 	creator.injectedPrompts.forEach(prompts.add);
 	await updatePromptsFeatures();
-	prompts.start();
+	await prompts.start();
 
 	return creator;
 }
@@ -200,6 +200,7 @@ async function initCreator(context) {
 async function updatePromptsFeatures() {
 	await prompts.changeAnswers((answers) => {
 		answers.features = features.filter((f) => f.enabled).map((f) => f.id);
+		console.log('updatePromptsFeatures-cb=>', answers.features);
 	});
 }
 
@@ -211,10 +212,50 @@ async function getCreation(context) {
 	return generateProjectCreation(creator);
 }
 
+//* 设置 enabled
+async function setFeatureEnabled({ id, enabled, updatePrompts = true }) {
+	console.log('setFeatureEnabled=>', id, enabled);
+	const feature = features.find((f) => f.id === id);
+	if (feature) {
+		feature.enabled = enabled;
+	} else {
+		console.warn(`Feature '${id}' not found`);
+	}
+	console.log('setFeatureEnabled-feature=>', feature);
+	if (updatePrompts) await updatePromptsFeatures();
+	console.log('setFeatureEnabled-return-feature=>', feature);
+	return feature;
+}
+
+async function applyPreset(id) {
+	const preset = presets.find((item) => item.id === id);
+	console.log('applyPreset', preset);
+
+	if (preset) {
+		for (const feature of features) {
+			feature.enabled = !!(
+				preset.features.includes(feature.id) ||
+				(feature.plugins && preset.features.some((f) => feature.plugins.includes(f)))
+			);
+		}
+
+    // console.log('applyPreset-features=<',features);
+		if (preset.raw) {
+			console.log('todo-preset-raw-', preset.raw.router, preset.raw.useConfigFiles);
+		}
+	} else {
+		console.warn(`Preset '${id}' not found`);
+	}
+
+  return generateProjectCreation(creator)
+}
+
 autoOpenLastProject();
 
 module.exports = {
 	getCurrent,
 	list,
 	getCreation,
+	setFeatureEnabled,
+	applyPreset,
 };

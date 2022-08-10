@@ -1,4 +1,5 @@
-const { chalk } = require('@vue/cli-shared-utils');
+// const { chalk } = require('@vue/cli-shared-utils');
+const { chalk } = require('../tools');
 
 module.exports = (cli) => {
 	cli.injectFeature({

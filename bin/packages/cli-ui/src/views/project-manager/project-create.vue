@@ -125,6 +125,16 @@
               </template>
 
             </div>
+            <div class="actions_bar">
+              <VueButton icon-left="arrow_back"
+                         label="上一步"
+                         class="big previous"
+                         @click="previous()" />
+              <VueButton icon-left="done"
+                         label="创建项目"
+                         class="big primary next"
+                         @click="showSavePreset =true" />
+            </div>
           </VueTab>
 
         </template>
@@ -150,6 +160,37 @@
                    class="danger" />
       </div>
     </VueModal>
+
+    <!-- 📷  设置预设 -->
+    <VueModal v-if="showSavePreset"
+              title="保存为新预设"
+              class="medium save-preset-modal"
+              @close="showSavePreset=false">
+      <div class="default-body">
+        {{formData}}
+        <VueFormField title="预设名"
+                      subtitle="将功能和配置保存为一套新的预设">
+          <VueInput icon-left="local_offer"
+                    v-model="formData.save" />
+        </VueFormField>
+        <div slot="footer"
+             class="actions_bar end">
+          <VueButton label="取消"
+                     class="flat close"
+                     @click="showSavePreset = false" />
+          <VueButton label="创建项目不保存预设"
+                     class="continue middleItem"
+                     @click="createWithoutSaving()" />
+          <VueButton label="保存预设 并且创建项目"
+                     icon-left="save"
+                     class="primary save"
+                     :disabled="!formData.save"
+                     @click="createProject()" />
+        </div>
+      </div>
+    </VueModal>
+    <!-- 设置预设 🍌 -->
+
   </div>
 </template>
 
@@ -159,6 +200,8 @@ import validateNpmPackageName from 'validate-npm-package-name'
 
 import PROJECT_CREATION from '@/graphql/project/projectCreation.gql'
 import CWD from '@/graphql/cwd/cwd.gql'
+import FEATURE_SET_ENABLED from '@/graphql/feature/featureSetEnabled.gql'
+import PRESET_APPLY from '@/graphql/preset/presetApply.gql'
 
 const formDataFactory = () => {
   return {
@@ -173,7 +216,7 @@ const formDataFactory = () => {
       url: '',
       clone: false
     },
-    save: ''
+    save: '',
   }
 }
 
@@ -197,7 +240,8 @@ export default {
       formData: formData,
       cwd: '',
       showCancel: false,
-      projectCreation: null
+      projectCreation: null,
+      showSavePreset: false
     }
   },
   computed: {
@@ -221,15 +265,69 @@ export default {
     next() {
       console.log('next=>')
     },
-    selectPreset(id) {
-      console.log('preset=>', id)
-      console.log('formdata=>', this.formData, '<==id=>', id)
-      this.formData.selectedPreset = id.id
+    async selectPreset(preset) {
+      console.log('preset=>', preset)
+      console.log('formdata=>', this.formData, '<==id=>', preset.id)
+      this.formData.selectedPreset = preset.id
+      if (preset.id === '__remoto__') return;
+
+      await this.$apollo.mutate({
+        mutation: PRESET_APPLY,
+        variables: {
+          id: preset.id
+        },
+        update: (store, { data: { presetApply } }) => {
+          console.log('PRESET_APPLY => update=>presetApplu', presetApply)
+          console.log('PRESET_APPLY => store=>', store)
+          store.writeQuery({ query: PROJECT_CREATION, data: { projectCreation: presetApply } })
+        }
+      })
+
     },
-    createWithoutSaving() { },
-    toggleFeature(feature) {
-      console.log('toggleFeature=>', feature)
-    }
+    async toggleFeature(feature) {
+      console.log('toggleFeature=>', feature);
+
+      await this.$apollo.mutate({
+        mutation: FEATURE_SET_ENABLED,
+        variables: {
+          id: feature.id,
+          enabled: !feature.enabled
+        }
+      })
+      // console.log('projectCreation=', this.projectCreation)
+      this.$apollo.queries.projectCreation.refetch();
+    },
+    createWithoutSaving() {
+      this.formData.save = ''
+      this.createProject()
+    },
+    async createProject() {
+      this.showSavePreset = false;
+
+      try {
+        await this.$apollo.mutate({
+          mutation: PROJECT_CREATE,
+          variables: {
+            input: {
+              folder: this.formData.folder,
+              force: this.formData.force,
+              bare: this.formData.bare,
+              enableGit: this.formData.enableGit,
+              gitCommitMessage: this.formData.gitCommitMessage,
+              packageManager: this.formData.packageManager,
+              preset: this.formData.selectedPreset,
+              remote: this.formData.remotePreset.url,
+              clone: this.formData.remotePreset.clone,
+              save: this.formData.save
+            }
+          }
+        })
+      } catch (error) {
+        console.log('error=>', error)
+      }
+
+
+    },
   },
 }
 </script>
