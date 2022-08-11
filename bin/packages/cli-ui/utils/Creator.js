@@ -1,32 +1,10 @@
+const debug = require('debug');
 const EventEmitter = require('events');
-const { loadOptions } = require('./Options');
+const { loadOptions, defaults, validatePreset, savePreset, rcPath } = require('./Options');
 const PromptModuleAPI = require('./PromptModuleAPI');
+const { chalk } = require('../utils/tools');
 
 const isManualMode = (answers) => answers.preset === '__manual__';
-
-const defaultPreset = {
-	useConfigFiles: false,
-	cssPreprocessor: undefined,
-	plugins: {
-		'@vue/cli-plugin-babel': {},
-		'@vue/cli-plugin-eslint': {
-			config: 'base',
-			lintOn: ['save'],
-		},
-	},
-};
-
-const defaults = {
-	lastChecked: undefined,
-	latestVersion: undefined,
-
-	packageManager: undefined,
-	useTaobaoRegistry: undefined,
-	presets: {
-		'Default (Vue 3)': Object.assign({ vueVersion: '3' }, defaultPreset),
-		'Default (Vue 2)': Object.assign({ vueVersion: '2' }, defaultPreset),
-	},
-};
 
 class Creator extends EventEmitter {
 	constructor(name, context, promptModules) {
@@ -40,6 +18,7 @@ class Creator extends EventEmitter {
 
 		this.injectedPrompts = [];
 		this.promptCompleteCbs = [];
+		1;
 		this.run = this.run.bind(this);
 
 		const promptAPI = new PromptModuleAPI(this);
@@ -77,10 +56,44 @@ class Creator extends EventEmitter {
 			featurePrompt,
 		};
 	}
+	// 提示 和 解析预设
+	promptAndResolvePreset(answers = null) {
+		console.log('Creator-promptAndResolvePreset-answers=>', answers);
+		// prompt
+		if (!answers) {
+			console.log('todo-promptAndResolvePreset-!answers=> false');
+		}
+		debug('vue-cli:answers')(answers);
+		if (answers.packageManager) {
+			console.log('todo-promptAndResolvePreset-packageManager-saveOptions');
+		}
+
+		let preset;
+		if (answers.preset && answers.preset !== '__manual__') {
+			console.log('todo-promptAndResolvePreset-resolvePreset--answers[preset]', answers[preset]);
+		} else {
+			preset = {
+				useConfigFiles: answers.useConfigFiles === 'files',
+				plugins: {},
+			};
+			answers.features = answers.features || [];
+			// 运行提示模块注册的cb以完成预设
+			console.log('gogogogo->__manual__->promptCompleteCbs', this.promptCompleteCbs);
+			this.promptCompleteCbs.forEach((cb) => cb(answers, preset));
+		}
+		console.log('promptAndResolvePreset-preset=>', preset);
+
+		// validate
+		validatePreset(preset); //todo
+
+		// save preset
+		if (answers.save && answers.saveName && savePreset(answers.saveName, preset)) {
+			console.log();
+			console.log(`🎉  Preset ${chalk.yellow(answers.saveName)} saved in ${chalk.yellow(rcPath)}`);
+		}
+	}
 }
 
 module.exports = {
 	Creator,
-	defaults,
-	defaultPreset,
 };

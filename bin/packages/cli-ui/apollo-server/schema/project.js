@@ -41,6 +41,19 @@ exports.types = gql`
 		prompts: [Prompt]
 	}
 
+	input ProjectCreateInput {
+		folder: String!
+		force: Boolean!
+		bare: Boolean!
+		packageManager: PackageManager
+		preset: String!
+		remote: String
+		clone: Boolean
+		save: String
+		enableGit: Boolean!
+		gitCommitMessage: String
+	}
+
 	extend type Query {
 		projectCurrent: Project
 		projects: [Project]
@@ -48,6 +61,7 @@ exports.types = gql`
 	}
 
 	extend type Mutation {
+		projectCreate(input: ProjectCreateInput): Project
 		featureSetEnabled(id: ID!, enabled: Boolean): Feature
 		presetApply(id: ID!): ProjectCreation
 	}
@@ -65,5 +79,6 @@ exports.resolvers = {
 		// projectInitCreation: (root, args, context) => projects.initCreator(context),
 		featureSetEnabled: (root, args, context) => projects.setFeatureEnabled(args, context),
 		presetApply: (root, { id }, context) => projects.applyPreset(id, context),
+		projectCreate: (root, { input }, context) => projects.create(input, context),
 	},
 };

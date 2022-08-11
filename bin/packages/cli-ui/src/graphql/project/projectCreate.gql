@@ -1,0 +1,9 @@
+#import "./projectFragment.gql"
+
+mutation projectCreate($input: ProjectCreateInput!) {
+  projectCreate(input: $input) {
+    ...project
+  }
+}
+
+

@@ -77,6 +77,10 @@ async function setAnswers(newAnswers) {
 	await updatePrompts();
 }
 
+function getAnswers() {
+	return answers;
+}
+
 function add(data) {
 	console.log('prompt-add->data=>', data);
 	const prompt = generatePrompt(data);
@@ -93,6 +97,7 @@ module.exports = {
 	start,
 	reset,
 	setAnswers,
+	getAnswers,
 	add,
 	changeAnswers,
 };

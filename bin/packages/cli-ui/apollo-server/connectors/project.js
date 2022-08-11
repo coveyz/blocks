@@ -1,8 +1,10 @@
 const fs = require('fs');
+const path = require('path');
 // Context
 const getContext = require('../context');
 const { chalk } = require('../../utils/tools');
 const { Creator } = require('../../utils/Creator');
+const { defaultPreset, defaults } = require('../../utils/Options');
 const { getPromptModules } = require('../../utils/createTools');
 
 //* Connectors
@@ -143,6 +145,7 @@ async function initCreator(context) {
 			const preset = presetsData[key];
 			const features = getFeatures(preset).map((f) => toShortPluginId(f));
 			let name = key;
+			console.log('presets-arr=>key=>', key);
 			if (key === 'default') {
 				name = 'org.vue.views.project-create.tabs.presets.default-preset';
 			} else if (key === '__default_vue_3__') {
@@ -239,7 +242,7 @@ async function applyPreset(id) {
 			);
 		}
 
-    // console.log('applyPreset-features=<',features);
+		// console.log('applyPreset-features=<',features);
 		if (preset.raw) {
 			console.log('todo-preset-raw-', preset.raw.router, preset.raw.useConfigFiles);
 		}
@@ -247,7 +250,62 @@ async function applyPreset(id) {
 		console.warn(`Preset '${id}' not found`);
 	}
 
-  return generateProjectCreation(creator)
+	return generateProjectCreation(creator);
+}
+
+function create(input, context) {
+	console.log('project-create-input', input);
+	return progress.wrap(PROGRESS_ID, context, async (setProgress) => {
+		console.log('project-create-cb-setProgress=>', setProgress);
+		setProgress({ status: 'creating' });
+		console.log('cwd=>', cwd.get());
+		const targetDir = path.join(cwd.get(), input.folder);
+		console.log('project-create-cb-targetDir=>', targetDir);
+
+		cwd.set(targetDir, context);
+		console.log('project-create-cb-cwd=>', cwd.get());
+		creator.context = targetDir;
+
+		const inCurrent = input.folder === '.';
+		const name = (creator.name = inCurrent ? path.relative('../', progress.cwd()) : input.folder);
+		console.log('project-create-cb-inCurrent=>', inCurrent);
+		console.log('project-create-cb-name=>', name);
+
+		// Answer
+		const answer = prompts.getAnswers();
+		console.log('project-create-cb-answer=>', answer);
+		await prompts.reset();
+
+		// Config files
+		let index;
+		console.log('answers.features-indexOf', answer.features.indexOf('use-config-files'));
+		if ((index = answer.features.indexOf('use-config-files')) !== -1) {
+			answer.features.splice(index, 1); // 删除 use-config-files
+			answer.useConfigFiles = 'files';
+			console.log('answer=>', answer);
+		}
+
+		// Preset
+		answer.preset = input.preset;
+		if (input.save) {
+			answer.save = true;
+			answer.saveName = input.save;
+		}
+
+		console.log('afer==answer=>', answer);
+		setProgress({ info: 'Resolving preset...' });
+
+		let preset;
+		if (input.preset === '__remote__' && input.remote) {
+			console.log('toodo=>remote');
+		} else if (input.preset === 'default') {
+			console.log('todo=>preset-default');
+		} else {
+			console.log('elese=>', input);
+			preset = await creator.promptAndResolvePreset(answer);
+		}
+		console.log('project-create-cb-preset=>', preset);
+	});
 }
 
 autoOpenLastProject();
@@ -258,4 +316,5 @@ module.exports = {
 	getCreation,
 	setFeatureEnabled,
 	applyPreset,
+	create,
 };
